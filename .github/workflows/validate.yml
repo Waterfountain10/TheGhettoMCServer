@@ -1,0 +1,24 @@
+name: Static validation
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Python scripts
+        run: python3 -m compileall -q scripts tests
+      - name: Run Geyser unit tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Check configuration invariants
+        run: python3 scripts/check_config.py
+      - name: Check shell syntax
+        run: bash -n scripts/*.sh
+      - name: Check Docker Compose syntax with placeholders
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+          rm .env
