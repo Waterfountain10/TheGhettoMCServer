@@ -26,11 +26,11 @@ services:
       VIEW_DISTANCE: "5"
       SIMULATION_DISTANCE: "4"
       SPAWN_PROTECTION: "0"
+      ENTITY_BROADCAST_RANGE_PERCENTAGE: "75"
+      NETWORK_COMPRESSION_THRESHOLD: "256"
       PLUGINS: |
         https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
     volumes:
       - ./data:/data
-      ENTITY_BROADCAST_RANGE_PERCENTAGE: "75"
-      NETWORK_COMPRESSION_THRESHOLD: "256"
     mem_limit: 1600m
