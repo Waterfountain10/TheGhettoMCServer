@@ -1,9 +1,31 @@
+# Credentials: never commit actual server secrets
 .env
 .env.*
 !.env.example
-data/
-backups/
-dashboard-db/
 *.pem
 *.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_ed25519
+# Persistent Minecraft state and plugin-generated keys
+data/
+world/
+world_nether/
+world_the_end/
+backups/
+dashboard-db/
+logs/
+crash-reports/
+# Zig build/cache
+zig-out/
+.zig-cache/
+zig/zig-out/
+zig/.zig-cache/
+# Local tools and OS files
 .DS_Store
+.idea/
+.vscode/
+*.swp
