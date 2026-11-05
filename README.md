@@ -95,7 +95,7 @@ References: [Geyser](https://geysermc.org/wiki/geyser/setup/) · [Floodgate](htt
 
 ## Public address: mc.kiem.net
 
-The repository is configured to advertise **mc.kiem.net** in its MOTD. This **does not create DNS or expose your Pi to the internet**. To make the hostname resolve after your Pi is installed:
+The server currently advertises **TheGhettoMCServer** in its MOTD. **mc.kiem.net is only a future option** if you purchase or control that domain. This **does not create DNS or expose your Pi to the internet**. To make the hostname resolve after your Pi is installed:
 
 1. You must own or control the DNS zone `kiem.net`. At your DNS provider, create an **A record** with name `mc` pointing to your home public IPv4 address. If the address changes, set up dynamic DNS updates. Do not publish a fake AAAA record if you have no working IPv6 route.
 2. Reserve a stable local IP for the Pi in your router. Forward **TCP 25565** for Java and **TCP+UDP 19132** for Bedrock to that local IP. Do not forward SSH (22), RCON (25575), or Tailscale administration.
@@ -118,3 +118,15 @@ Once the Pi is running, use `bash scripts/healthcheck.sh` to capture memory, tem
 4. If exploration causes lag, pre-generate a limited world on a stronger machine and copy it to the Pi. Avoid heavy plugins and large mob farms. If the Pi cannot sustain three players, move hosting to a more capable device.
 
 **Do not run aggressive synthetic traffic floods or large chunk-generation stress tests on the 2 GB Pi.** The tests in GitHub Actions are static/unit tests, not a substitute for a real Paper+Geyser multiplayer test.
+
+
+## Operational hardening and recovery
+
+- The Docker container has all Linux capabilities dropped, no-new-privileges, a PID cap, and bounded Docker logs. These measures reduce risk but do not guarantee isolation from vulnerabilities in the container runtime, plugins or host kernel.
+- RCON is used only **inside the Minecraft container** by `docker compose exec`; it has no published host port. Never publish TCP 25575 or put an RCON dashboard on the public internet.
+- The backup script stops Minecraft, creates a temporary archive, validates that the archive is readable, atomically renames it, and restarts the server even if archiving fails. A readable archive is not proof that the world restores successfully: periodically restore a copy on another machine.
+- Use a strong unique SSH password or SSH keys, disable password login after key-based SSH is verified, keep Raspberry Pi OS and Docker updated, and administer over Tailscale. Don't expose SSH on your router.
+- To avoid downtime after power loss, Docker's `restart: unless-stopped` will restart the server when Docker returns, but it cannot protect against SD corruption, network failure, a broken plugin, or loss of electricity. Use a UPS for better uptime.
+- For **free off-site backups**, configure a personal cloud storage account with [rclone](https://rclone.org/) on the Pi. Use `rclone crypt` for client-side encryption and an independently stored recovery password. Never commit cloud credentials or encryption passwords. Free storage quotas and upload reliability vary; this is optional and not yet configured.
+- A CDN does not improve Minecraft game-state traffic or preserve your world. A TCP/UDP tunnel can provide a convenient public address, but the tunnel provider and home internet remain additional availability dependencies.
+- For a genuinely resilient setup, monitor disk space, Pi throttling, memory, TPS, backup age, and periodically rehearse restoration.
