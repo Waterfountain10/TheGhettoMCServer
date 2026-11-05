@@ -4,7 +4,7 @@
 
 ## Hardware and limits
 
-Raspberry Pi 4 Model B, **2 GB RAM**, 64 GB microSD, optional Waveshare 3.5-inch SPI LCD, fan and 5V/3A power supply. Use Raspberry Pi OS Lite **64-bit** and Ethernet if possible. **Do not install a desktop GUI or touchscreen drivers yet.** This is an experimental low-memory setup: start with **2–3 players**, 4 maximum, and expect lag during exploration/chunk generation. If performance is unacceptable, upgrade to a Pi 5 with 8 GB or a cloud VM. Back up worlds off the SD card.
+Raspberry Pi 4 Model B, **2 GB RAM**, 64 GB microSD, optional Waveshare 3.5-inch SPI LCD, fan and 5V/3A power supply. Use Raspberry Pi OS Lite **64-bit** and Ethernet if possible. **Do not install a desktop GUI or touchscreen drivers yet.** This is an experimental low-memory setup: start with **three players**, with no spare capacity, and expect lag during exploration/chunk generation. If performance is unacceptable, upgrade to a Pi 5 with 8 GB or a cloud VM. Back up worlds off the SD card.
 
 ## A. First-time Pi setup (requires physical access to the SD card and a computer)
 
@@ -66,7 +66,7 @@ For a Zig CLI, install a compatible Zig release on the Pi, run `cd zig && zig bu
 ## F. Optimization and stability
 
 - `MC_MEMORY=1152M` in `.env`; don't allocate all 2 GB to Java. `mem_limit: 1600m` leaves space for Linux, networking and page cache. If the container is OOM-killed, reduce heap to 1024M and inspect logs.
-- View distance 5, simulation distance 4, max players 4. Avoid massive farms, lots of mobs, and simultaneous exploration.
+- View distance 5, simulation distance 4, max players 3. Avoid massive farms, lots of mobs, and simultaneous exploration.
 - Paper is preferred over vanilla for optimizations. Avoid additional plugins, Dynmap, a web control panel, desktop GUI or graphical Waveshare drivers on this Pi.
 - Consider pregenerating a **small** world on a more powerful computer and transferring it to the Pi. Generating many chunks on the Pi itself can cause severe lag and fill the SD card.
 - Keep the Pi cool, use Ethernet and a quality power supply. Check throttling with `vcgencmd get_throttled`, memory with `free -h`, disk with `df -h`, and server tick time with `docker compose exec -T minecraft rcon-cli tps` (where supported).
@@ -92,3 +92,29 @@ Pin Minecraft versions after confirming compatibility; don't blindly update Pape
 - **Friends cannot connect remotely**: check CGNAT, router rules, public address and firewall; test locally first.
 
 References: [Geyser](https://geysermc.org/wiki/geyser/setup/) · [Floodgate](https://geysermc.org/wiki/floodgate/setup/) · [Docker Minecraft](https://docker-minecraft-server.readthedocs.io/) · [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
+
+## Public address: mc.kiem.net
+
+The repository is configured to advertise **mc.kiem.net** in its MOTD. This **does not create DNS or expose your Pi to the internet**. To make the hostname resolve after your Pi is installed:
+
+1. You must own or control the DNS zone `kiem.net`. At your DNS provider, create an **A record** with name `mc` pointing to your home public IPv4 address. If the address changes, set up dynamic DNS updates. Do not publish a fake AAAA record if you have no working IPv6 route.
+2. Reserve a stable local IP for the Pi in your router. Forward **TCP 25565** for Java and **TCP+UDP 19132** for Bedrock to that local IP. Do not forward SSH (22), RCON (25575), or Tailscale administration.
+3. Test local joins first, then have a friend test from a different internet connection. If your ISP uses CGNAT, ordinary port forwarding will not work; use a compatible public TCP+UDP tunnel or hosting provider.
+4. Java players enter `mc.kiem.net` (default 25565). Bedrock players enter `mc.kiem.net` and port **19132**. An SRV record is optional and cannot replace a missing A/AAAA record.
+
+**DNS is not configured by this repository.** Domain ownership and DNS-provider access are required before it can be made live.
+
+## Three-player performance and stress-test checklist
+
+This configuration targets **three concurrent players**, Paper Java **26.3**, Geyser/Floodgate, 1152 MB heap, view distance 5, simulation distance 4, and a maximum of three players. These are conservative defaults, **not guaranteed smooth performance** on a 2 GB Pi 4. Rendering distance and FPS on each device are client-side settings; use 4–6 chunks and low graphics on weaker devices.
+
+Before inviting friends, run `python3 scripts/check_config.py`, `python3 -m unittest discover -s tests -v`, `bash -n scripts/*.sh`, and `docker compose config --quiet` on a Docker host. These validate configuration, not real multiplayer behavior.
+
+Once the Pi is running, use `bash scripts/healthcheck.sh` to capture memory, temperature, throttling, TPS, logs, and listening ports. For a real three-player load test:
+
+1. Back up the world, join as one Java player, one iPad Bedrock player, and one Windows Bedrock player.
+2. Play together for 10 minutes while stationary, then explore separately for 10 minutes to trigger chunk generation.
+3. Run `bash scripts/healthcheck.sh` before, during and after. Check sustained TPS near 20, lack of out-of-memory errors, acceptable device FPS and no disconnects. Record whether Bedrock NetherNet joins work from both LAN and internet.
+4. If exploration causes lag, pre-generate a limited world on a stronger machine and copy it to the Pi. Avoid heavy plugins and large mob farms. If the Pi cannot sustain three players, move hosting to a more capable device.
+
+**Do not run aggressive synthetic traffic floods or large chunk-generation stress tests on the 2 GB Pi.** The tests in GitHub Actions are static/unit tests, not a substitute for a real Paper+Geyser multiplayer test.
