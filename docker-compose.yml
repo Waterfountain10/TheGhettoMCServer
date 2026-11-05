@@ -13,11 +13,11 @@ services:
     environment:
       EULA: "TRUE"
       TYPE: "PAPER"
-      VERSION: "${MC_VERSION:-LATEST}"
+      VERSION: "${MC_VERSION:-26.3}"
       MEMORY: "${MC_MEMORY:-1152M}"
       INIT_MEMORY: "256M"
-      MOTD: "Crossplay Survival"
-      MAX_PLAYERS: "4"
+      MOTD: "mc.kiem.net | Java + Bedrock"
+      MAX_PLAYERS: "3"
       ONLINE_MODE: "TRUE"
       ENABLE_RCON: "TRUE"
       RCON_PASSWORD: "${RCON_PASSWORD:?Run bash scripts/bootstrap.sh first}"
@@ -31,4 +31,6 @@ services:
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
     volumes:
       - ./data:/data
+      ENTITY_BROADCAST_RANGE_PERCENTAGE: "75"
+      NETWORK_COMPRESSION_THRESHOLD: "256"
     mem_limit: 1600m
