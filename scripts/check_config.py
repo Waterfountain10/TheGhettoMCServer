@@ -13,7 +13,7 @@ assert 'VERSION: "${MC_VERSION:-26.3}"' in compose
 assert 'MAX_PLAYERS: "3"' in compose
 assert '"19132:19132/tcp"' in compose and '"19132:19132/udp"' in compose
 assert '"25565:25565/tcp"' in compose
-assert "Geyser" in compose and "floodgate" in compose.lower()
+assert "geyser" in compose.lower() and "floodgate" in compose.lower()
 assert "1152M" in compose
 assert "MC_VERSION=26.3" in bootstrap
 assert "mc.kiem.net" in compose
