@@ -17,8 +17,12 @@ jobs:
         run: python3 scripts/check_config.py
       - name: Check shell syntax
         run: bash -n scripts/*.sh
+      - name: Check backup script guardrails
+        run: |
+          grep -q "tar -tzf" scripts/backup.sh
+          grep -q "trap cleanup EXIT" scripts/backup.sh
       - name: Check Docker Compose syntax with placeholders
         run: |
           cp .env.example .env
+          trap 'rm -f .env' EXIT
           docker compose config --quiet
-          rm .env
