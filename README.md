@@ -27,11 +27,17 @@ Follow the official [Docker Engine Debian instructions](https://docs.docker.com/
 
 ## C. Download and start
 
-This repo is private. On the Pi, clone it using a GitHub SSH deploy key or a fine-grained token (do not paste tokens into chat or commit them). Alternatively, download an archive while authenticated. Then:
+This repository is currently public. On the Pi, clone it directly (no GitHub token required):
 
 ```bash
-cd minecraft-crossplay
+git clone https://github.com/Waterfountain10/TheGhettoMCServer.git
+cd TheGhettoMCServer
 bash scripts/bootstrap.sh
+```
+
+Then inspect the logs:
+
+```bash
 docker compose logs --tail=100 minecraft
 ```
 
@@ -46,7 +52,7 @@ On the same LAN: Java Mac -> server address `PI_LAN_IP:25565`; Bedrock iPad or W
 Install [Tailscale](https://tailscale.com/download/linux) on the Pi and iPhone; sign into the same tailnet, run `sudo tailscale up` on the Pi, then use an iPhone SSH app to connect to its Tailscale IP. No public admin dashboard is exposed, saving RAM and reducing attack surface. From SSH, run:
 
 ```bash
-cd minecraft-crossplay
+cd TheGhettoMCServer
 docker compose ps
 docker compose logs --tail=100 minecraft
 docker compose exec -T minecraft rcon-cli list
