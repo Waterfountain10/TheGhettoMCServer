@@ -16,10 +16,11 @@ services:
       VERSION: "${MC_VERSION:-26.3}"
       MEMORY: "${MC_MEMORY:-1152M}"
       INIT_MEMORY: "256M"
-      MOTD: "mc.kiem.net | Java + Bedrock"
+      MOTD: "TheGhettoMCServer | Java + Bedrock"
       MAX_PLAYERS: "3"
       ONLINE_MODE: "TRUE"
       ENABLE_RCON: "TRUE"
+      ENABLE_COMMAND_BLOCK: "FALSE"
       RCON_PASSWORD: "${RCON_PASSWORD:?Run bash scripts/bootstrap.sh first}"
       DIFFICULTY: "normal"
       MODE: "survival"
@@ -34,3 +35,13 @@ services:
     volumes:
       - ./data:/data
     mem_limit: 1600m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 256
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
