@@ -16,6 +16,6 @@ assert '"25565:25565/tcp"' in compose
 assert "geyser" in compose.lower() and "floodgate" in compose.lower()
 assert "1152M" in compose
 assert "MC_VERSION=26.3" in bootstrap
-assert "mc.kiem.net" in compose
+assert "TheGhettoMCServer" in compose
 assert ".env" in ignore and "data/" in ignore and "backups/" in ignore
 print("PASS: static crossplay, resource, and secret checks")
