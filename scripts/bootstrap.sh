@@ -8,7 +8,7 @@ command -v python3 >/dev/null || { echo "Install Python 3"; exit 1; }
 [[ "$(uname -m)" == "aarch64" ]] || { echo "Use Raspberry Pi OS Lite 64-bit (aarch64)"; exit 1; }
 if [[ ! -f .env ]]; then
   umask 077
-  printf 'MC_VERSION=LATEST\nMC_MEMORY=1152M\nRCON_PASSWORD=%s\n' "$(python3 -c 'import secrets; print(secrets.token_hex(24))')" > .env
+  printf 'MC_VERSION=26.3\nMC_MEMORY=1152M\nRCON_PASSWORD=%s\n' "$(python3 -c 'import secrets; print(secrets.token_hex(24))')" > .env
 fi
 docker compose up -d minecraft
 config="data/plugins/Geyser-Spigot/config.yml"
